@@ -42,6 +42,7 @@ NeoBlinker *rgbLED;
 bool       wifiConnected = false;
 bool       wifiConnecting = false;
 bool       needsPairing = false;
+bool       inCmdMode = false;
 
 struct HKTV : Service::Television { 
 
@@ -225,7 +226,8 @@ static void homeSpanEventHandler(int32_t event_id) {
     case HOMESPAN_WIFI_CONNECTING:
       rgbLED->setColor(COLOR_ORANGE);
       if(!wifiConnecting) {
-        rgbLED->start(250);
+        rgbLED->setBrightness(128);
+        rgbLED->start(150);
         wifiConnecting = true;
       }
     break;
@@ -237,8 +239,7 @@ static void homeSpanEventHandler(int32_t event_id) {
         rgbLED->setColor(COLOR_MAGENTA);
         rgbLED->startPulse(2);
       } else {
-        rgbLED->setColor(COLOR_GREEN);
-        rgbLED->setBrightness(10);
+        rgbLED->setColor(COLOR_ORANGE);
         rgbLED->on();
       }
     break;
@@ -270,9 +271,53 @@ static void homeSpanEventHandler(int32_t event_id) {
     break;
 
     case HOMESPAN_AP_STARTED:
+      rgbLED->setColor(COLOR_ORANGE);
+      rgbLED->start(1000);
     break;
 
     case HOMESPAN_AP_CONNECTED:
+      rgbLED->setColor(COLOR_ORANGE);
+      rgbLED->start(LED_AP_CONNECTED);
+    break;
+
+    case HOMESPAN_ALERT:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->start(100);
+    break;
+
+    case HOMESPAN_ENTER_CMD_MODE:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->on();
+      inCmdMode = true;
+    break;
+
+    case HOMESPAN_EXIT_CMD_MODE:
+      inCmdMode = false;
+    break;
+
+    case HOMESPAN_CMD_SELECT_NONE:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->start(500,0.3,event_id-HOMESPAN_ENTER_CMD_MODE,1000);  
+    break;
+
+    case HOMESPAN_CMD_SELECT_RESTART:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->start(500,0.3,event_id-HOMESPAN_ENTER_CMD_MODE,1000);  
+    break;
+
+    case HOMESPAN_CMD_SELECT_AP_START:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->start(500,0.3,event_id-HOMESPAN_ENTER_CMD_MODE,1000);  
+    break;
+
+    case HOMESPAN_CMD_SELECT_UNPAIR:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->start(500,0.3,event_id-HOMESPAN_ENTER_CMD_MODE,1000);  
+    break;
+
+    case HOMESPAN_CMD_SELECT_WIFI_DELETE:
+      rgbLED->setColor(COLOR_CYAN);
+      rgbLED->start(500,0.3,event_id-HOMESPAN_ENTER_CMD_MODE,1000);  
     break;
   }
 }
@@ -297,6 +342,7 @@ void setup() {
   tv.connect(&Serial2, TV_ID, RX_PIN, TX_PIN);
   
   homeSpan.setControlPin(BTN_PIN);
+  homeSpan.setApSSID(tvName);
   homeSpan.addEventCallback(homeSpanEventHandler);
   homeSpan.begin(Category::Television,"LGTV", "LGTV-HK", "LGTV-HK");
 
