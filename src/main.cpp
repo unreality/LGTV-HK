@@ -353,7 +353,7 @@ void setup() {
       new Characteristic::Manufacturer("LG");
       new Characteristic::SerialNumber(sn);
       new Characteristic::Model("LGTV-HK");
-      new Characteristic::FirmwareRevision("0.1");
+      new Characteristic::FirmwareRevision("0.2");
       new Characteristic::Identify();
       
     new Service::HAPProtocolInformation();
