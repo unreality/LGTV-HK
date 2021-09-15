@@ -184,7 +184,7 @@ struct HKTV : Service::Television {
   }
 
   void loop() {
-    bool b;
+    byte b;
     int i;
     if(millis() - lastUpdate > REFRESH_INTERVAL) {
       
@@ -362,7 +362,14 @@ void setup() {
   new HKTV(&tv);
 }
 
+unsigned long lastLEDUpdate = 0;
+
 void loop() {
-  // put your main code here, to run repeatedly:
   homeSpan.poll();
+
+  if(millis() - lastLEDUpdate >= 250 && wifiConnected && !needsPairing && !inCmdMode) {
+      rgbLED->setColor(COLOR_GREEN);
+      rgbLED->on();
+      lastLEDUpdate = millis();
+  }
 }
